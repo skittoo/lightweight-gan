@@ -1441,8 +1441,10 @@ class Trainer():
         if 'default' in types:
             for i in tqdm(range(num_image_tiles), desc='Saving generated default images'):
                 latents = torch.randn((1, latent_dim)).cuda(self.rank)
+                print(f"Latent shape: {latents.shape}")
                 generated_image = self.generate_(self.GAN.G, latents)
                 path = str(self.results_dir / dir_name / f'{str(num)}-{str(i)}.{ext}')
+                print(f"Image number {i} in default rtpe has path: {path}")
                 torchvision.utils.save_image(generated_image[0], path, nrow=1)
 
         # moving averages
@@ -1451,6 +1453,7 @@ class Trainer():
                 latents = torch.randn((1, latent_dim)).cuda(self.rank)
                 generated_image = self.generate_(self.GAN.GE, latents)
                 path = str(self.results_dir / dir_name / f'{str(num)}-{str(i)}-ema.{ext}')
+                print(f"Image number {i} in ema type has path: {path}")
                 torchvision.utils.save_image(generated_image[0], path, nrow=1)
 
         return dir_full
