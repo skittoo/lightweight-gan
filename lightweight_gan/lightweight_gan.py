@@ -1426,7 +1426,7 @@ class Trainer():
         torchvision.utils.save_image(generated_images, str(self.results_dir / self.name / f'{str(num)}-ema.{ext}'), nrow=num_rows)
 
     @torch.no_grad()
-    def generate(self, num=0, num_image_tiles=4, checkpoint=None, types=['default', 'ema']):
+    def generate(self, num=0, num_image_tiles=1, checkpoint=None, types=['default', 'ema']):
         self.GAN.eval()
 
         latent_dim = self.GAN.latent_dim
@@ -1446,7 +1446,8 @@ class Trainer():
                 path = str(self.results_dir / dir_name / f'{str(num)}-{str(i)}.{ext}')
                 print(f"Image number {i} in default rtpe has path: {path}")
                 torchvision.utils.save_image(generated_image[0], path, nrow=1)
-
+                return path, latents
+            
         # moving averages
         if 'ema' in types:
             for i in tqdm(range(num_image_tiles), desc='Saving generated EMA images'):
