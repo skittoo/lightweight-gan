@@ -1476,6 +1476,7 @@ class Trainer():
         if 'default' in types:
             for i in tqdm(range(num_image_tiles), desc='Saving generated default images'):
                 # latents = torch.randn((1, latent_dim)).cuda(self.rank)
+                latents = latents.cuda(self.rank)
                 print(f"Latent shape: {latents.shape}")
                 generated_image = self.generate_(self.GAN.G, latents)
                 path = str(self.results_dir / dir_name / f'{str(num)}-{str(i)}.{ext}')
