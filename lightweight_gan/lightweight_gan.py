@@ -1459,6 +1459,41 @@ class Trainer():
                 torchvision.utils.save_image(generated_image[0], path, nrow=1)
 
         return dir_full
+    
+    @torch.no_grad()
+    def generate_from_latents(self, num=0, num_image_tiles=1, checkpoint=None, types=['default', 'ema'], latents=None):
+        self.GAN.eval()
+
+        latent_dim = self.GAN.latent_dim
+        dir_name = self.name + str('-generated-') + str(checkpoint)
+        dir_full = Path().absolute() / self.results_dir / dir_name
+        ext = self.image_extension
+
+        if not dir_full.exists():
+            os.mkdir(dir_full)
+
+        # regular
+        if 'default' in types:
+            for i in tqdm(range(num_image_tiles), desc='Saving generated default images'):
+                # latents = torch.randn((1, latent_dim)).cuda(self.rank)
+                print(f"Latent shape: {latents.shape}")
+                generated_image = self.generate_(self.GAN.G, latents)
+                path = str(self.results_dir / dir_name / f'{str(num)}-{str(i)}.{ext}')
+                print(f"Image number {i} in default rtpe has path: {path}")
+                torchvision.utils.save_image(generated_image[0], path, nrow=1)
+                return path, latents
+            
+        # moving averages
+        if 'ema' in types:
+            for i in tqdm(range(num_image_tiles), desc='Saving generated EMA images'):
+                latents = torch.randn((1, latent_dim)).cuda(self.rank)
+                print(f"Latent shape: {latents.shape}")
+                generated_image = self.generate_(self.GAN.GE, latents)
+                path = str(self.results_dir / dir_name / f'{str(num)}-{str(i)}-ema.{ext}')
+                print(f"Image number {i} in ema type has path: {path}")
+                torchvision.utils.save_image(generated_image[0], path, nrow=1)
+
+        return dir_full
 
     @torch.no_grad()
     def show_progress(self, num_images=4, types=['default', 'ema']):
